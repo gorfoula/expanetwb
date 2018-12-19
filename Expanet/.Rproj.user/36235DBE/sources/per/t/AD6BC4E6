@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1544799104753.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1977457056",
+    "id" : "AD6BC4E6",
+    "lastKnownWriteTime" : 1544799761,
+    "last_content_update" : 1544799761572,
+    "path" : "D:/Dropbox/R_Projects/Expanet_web_portal/Expanet/execute_expanet.R",
+    "project_path" : "execute_expanet.R",
+    "properties" : {
+        "cursorPosition" : "29,0",
+        "scrollLine" : "17"
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
