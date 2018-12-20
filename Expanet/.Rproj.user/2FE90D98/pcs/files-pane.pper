@@ -1,6 +1,10 @@
 {
-    "path" : "~/Downloads/R_projects/Expanet_web_portal/Expanet/data/output/res716c4f4d6be2/C",
+    "path" : "~/Downloads/R_projects/Expanet_web_portal/Expanet/data/output/resfd91f3a6125",
     "sortOrder" : [
+        {
+            "ascending" : true,
+            "columnIndex" : 3
+        },
         {
             "ascending" : true,
             "columnIndex" : 2
