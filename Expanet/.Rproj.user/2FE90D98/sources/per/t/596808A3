@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1545325290955.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2731194962",
+    "id" : "596808A3",
+    "lastKnownWriteTime" : 1545350523,
+    "last_content_update" : 1545350523290,
+    "path" : "~/Downloads/R_projects/Expanet_web_portal/Expanet/server.R",
+    "project_path" : "server.R",
+    "properties" : {
+        "cursorPosition" : "47,19",
+        "scrollLine" : "38"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
