@@ -184,18 +184,19 @@ shinyUI(
                                  dataTableOutput("score.table")
                                  )
                              ),
+                    ###### PLOT NETS ####
                     tabPanel("Networks",
                              div(style="display: inline-block;vertical-align:top; margin-top: 8px;width: 100%;"
                                  ,actionButton(inputId = "gmlplot.button"
                                                , label = "Get the list of Pathways")
                              ),
                              selectInput("layout", "Layout", 
-                                         c("tree","auto",
+                                         c("auto","tree",
                                            "Fruchterman-Reingold","Kamada-Kawai")
                              ),
                              column(width = 6,
                                     box(title = "Control",
-                                        status = "warning",
+                                        status = "primary",
                                         width = NULL,
                                         solidHeader = TRUE,collapsible = TRUE,
                                         uiOutput("dropdown.gmlplot.C"),
@@ -204,9 +205,10 @@ shinyUI(
                                     ),
                              column(width = 6,
                                     box(title = "Treatment",
+                                        status = "info",
                                         width = NULL,
                                         solidHeader = TRUE,collapsible = TRUE,
-                                        background = "olive",
+                                        #background = "olive",
                                         uiOutput("dropdown.gmlplot.T"),
                                         plotOutput("graph.T")
                                         )

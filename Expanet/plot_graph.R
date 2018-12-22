@@ -12,7 +12,7 @@ lbs_cols[soi]="black"
 par(mar=c(0,0,0,0))
 igraph::plot.igraph(g, layout=layout_with_fr,vertex.color = as.vector(cls),
                     label.color="red", vertex.size=5, vertex.label.dist=1.5,
-                    vertex.label.family="Calibri",vertex.label.cex=0.5,
+                    vertex.label.family="Calibri",vertex.label.cex=0.8,
                     vertex.label.color=lbs_cols,vertex.label.font=2)
 
 #layout_as_tree
