@@ -44,6 +44,16 @@ progressGroup <- function(text, value, min = 0, max = value, color = "aqua") {
     prgoressBar(round(value / max * 100), color = color, size = "sm")
   )
 }
+map.path.names<-function(score.table,pnames){
+  npaths=nrow(score.table)
+  res<-matrix(nrow = npaths,ncol = 1,"")
+  for (k in 1:npaths) {
+    cn=paste("path:",score.table[k,2],sep = "")
+    res[k]<-pnames[cn]
+  }
+  return(res)
+  
+}
 load.file<-function(file){
   tryCatch(
     {
@@ -103,6 +113,42 @@ exec2 <- function(C.adj,T.adj,gse) {
   )
   write.table("done",paste(tf,"/done.txt",sep = ""),sep = "\t")
   return(1)
+}
+
+net.plot <- function(g,lat) {
+  
+  #g<-read_graph("data/output/control/graphs/pbe04146_Peroxisome.gml", format = c("gml"))
+  
+  cls=rep("grey80",1,length(V(g)))
+  soi=which(vertex_attr(g,"issoi")==1)
+  cls[soi]="skyblue1"
+  
+  lbs_cols=rep("grey80",1,length(V(g)))
+  lbs_cols[soi]="black"
+  
+  return(
+    renderPlot({
+      par(mar=c(0,0,0,0))
+      switch(lat,
+             "tree" = igraph::plot.igraph(g, layout=layout_as_tree,vertex.color = as.vector(cls),
+                                          label.color="red", vertex.size=5, vertex.label.dist=1.5,
+                                          vertex.label.family="Calibri",vertex.label.cex=0.5,
+                                          vertex.label.color=lbs_cols,vertex.label.font=2),
+             "auto" = igraph::plot.igraph(g, layout=layout_nicely,vertex.color = as.vector(cls),
+                                          label.color="red", vertex.size=5, vertex.label.dist=1.5,
+                                          vertex.label.family="Calibri",vertex.label.cex=0.5,
+                                          vertex.label.color=lbs_cols,vertex.label.font=2),
+             "Fruchterman-Reingold" = igraph::plot.igraph(g, layout=layout_with_fr,vertex.color = as.vector(cls),
+                                                          label.color="red", vertex.size=5, vertex.label.dist=1.5,
+                                                          vertex.label.family="Calibri",vertex.label.cex=0.5,
+                                                          vertex.label.color=lbs_cols,vertex.label.font=2),
+             "Kamada-Kawai"=igraph::plot.igraph(g, layout=layout_with_kk,vertex.color = as.vector(cls),
+                                                label.color="red", vertex.size=5, vertex.label.dist=1.5,
+                                                vertex.label.family="Calibri",vertex.label.cex=0.5,
+                                                vertex.label.color=lbs_cols,vertex.label.font=2)
+             )#
+    })
+  )
 }
 
 

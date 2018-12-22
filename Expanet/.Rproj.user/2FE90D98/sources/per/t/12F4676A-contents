@@ -4,6 +4,7 @@ library(shinyjs)
 library("promises")
 #library("dplyr")
 library("future")
+library(igraph)
 source("auxiliary_funcs.R")
 # path containing all files, including ui.R and server.R
 #setwd("/path/to/my/shiny/app/dir")   
@@ -26,4 +27,4 @@ Sys.chmod(d2,'777',F)
 
 print(tf)
 
-enableBookmarking(store = "url")
+enableBookmarking(store = "server")

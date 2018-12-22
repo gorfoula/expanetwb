@@ -21,6 +21,7 @@ shinyUI(
       sidebarSearchForm(textId = "searchText", buttonId = "searchButton",
                         label = "Search..."),
       sidebarMenu(id = "sidebar",
+                  ###### SIDE MENU ####
                   menuItem("Load your data", tabName = "dselection", icon = icon("database")),
                   menuItem("Results", tabName = "results", icon = icon("database")),
                   menuItem("About", tabName = "help_page", icon = icon("database")),
@@ -33,16 +34,23 @@ shinyUI(
       tabItems(
         tabItem(tabName = "dselection",
                 fluidRow(
-                  column(width = 12,
-                         box(title = "Submission Progress",status = "success",
+                  column(width = 6,
+                         box(title = "File Submission",status = "success",
                              width = NULL,
                              #p(strong("Goal Completion"), class = "text-center"),
                              uiOutput(outputId = "progressOne"),
                              uiOutput(outputId = "progressTwo")
                              #uiOutput(outputId = "progressThree")
                              )
+                         ),
+                  column(width = 6,
+                         box(title = "Submitted Files",status = "success",
+                             width = NULL,
+                             tableOutput("progresstable")
+                             )
                          )
                   ),
+                ####### STEP 1 ######
                 fluidRow(
                   column(width = 4,
                          box(title = "STEP1: Control experiment",
@@ -73,6 +81,7 @@ shinyUI(
                              
                          )
                   ),
+                  ####### STEP 2 ######
                   column(width = 4,
                          box(title = "STEP2: Treatment Experiment",
                              status = "info",
@@ -101,6 +110,7 @@ shinyUI(
                              )
                          )
                   ,
+                  ####### STEP 3 ######
                   column(width = 4,
                          box(title = "STEP3: Gene Set",
                              status = "warning",
@@ -132,6 +142,7 @@ shinyUI(
                          )
                   )
         ),
+        #### RESULTS TAB#####
         tabItem(tabName = "results",
                 fluidRow(
                   tabBox(
@@ -159,16 +170,64 @@ shinyUI(
                                      )
                                  )
                              ),
+                    ##### SCORE MATRIX #######s
                     tabPanel("Enriched Pathways",
-                             box(title = "",status = "info"
+                             box(title = "Score Table",status = "info"
                                  ,width=NULL,solidHeader = TRUE,
+                                 useShinyjs(),
+                                 div(style="display: inline-block;vertical-align:top; margin-top: 8px;width: 100%;"
+                                     ,actionButton(inputId = "score.button"
+                                                   , label = "Show Table")
+                                     ),
+                                 # Button
+                                 uiOutput("d.button1"),
                                  dataTableOutput("score.table")
                                  )
                              ),
-                    tabPanel("Networks", "Tab content 2"),
-                    tabPanel("Download", "Tab content 3")
+                    tabPanel("Networks",
+                             div(style="display: inline-block;vertical-align:top; margin-top: 8px;width: 100%;"
+                                 ,actionButton(inputId = "gmlplot.button"
+                                               , label = "Get the list of Pathways")
+                             ),
+                             selectInput("layout", "Layout", 
+                                         c("tree","auto",
+                                           "Fruchterman-Reingold","Kamada-Kawai")
+                             ),
+                             column(width = 6,
+                                    box(title = "Control",
+                                        status = "warning",
+                                        width = NULL,
+                                        solidHeader = TRUE,collapsible = TRUE,
+                                        uiOutput("dropdown.gmlplot.C"),
+                                        plotOutput("graph.C")
+                                        )
+                                    ),
+                             column(width = 6,
+                                    box(title = "Treatment",
+                                        width = NULL,
+                                        solidHeader = TRUE,collapsible = TRUE,
+                                        background = "olive",
+                                        uiOutput("dropdown.gmlplot.T"),
+                                        plotOutput("graph.T")
+                                        )
+                                    )
+                             ),
+                    ###### DOWNLOAD PANEL #####
+                    tabPanel("Download",
+                             useShinyjs(),
+                             div(style="display: inline-block;vertical-align:top; margin-top: 8px;width: 100%;"
+                                 ,actionButton(inputId = "gml.button"
+                                               , label = "Get the list of Pathways")
+                                 ),
+                             uiOutput("d.button2"),
+                             uiOutput("dropdown.gml.C"),
+                             #helpText("Download pathways in gml format."),
+                             uiOutput("d.button3"),
+                             uiOutput("dropdown.gml.T")
+                             #helpText("Download pathways in gml format.")
+                             )
+                    )
                   )
-                )
         ),
         tabItem(tabName = "help_page",
                 fluidRow(

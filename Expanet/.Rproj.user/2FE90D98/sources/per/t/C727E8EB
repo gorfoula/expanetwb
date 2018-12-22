@@ -5,15 +5,15 @@
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "583707153",
+    "hash" : "449651174",
     "id" : "C727E8EB",
-    "lastKnownWriteTime" : 1545341917,
-    "last_content_update" : 1545341917089,
+    "lastKnownWriteTime" : 1545438606,
+    "last_content_update" : 1545438606571,
     "path" : "~/Downloads/R_projects/Expanet_web_portal/Expanet/ui.R",
     "project_path" : "ui.R",
     "properties" : {
-        "cursorPosition" : "158,2",
-        "scrollLine" : "0"
+        "cursorPosition" : "199,18",
+        "scrollLine" : "195"
     },
     "relative_order" : 2,
     "source_on_save" : false,
