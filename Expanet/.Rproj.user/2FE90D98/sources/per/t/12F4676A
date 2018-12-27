@@ -5,14 +5,14 @@
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "3208044948",
+    "hash" : "938290410",
     "id" : "12F4676A",
-    "lastKnownWriteTime" : 1545420373,
-    "last_content_update" : 1545420373787,
+    "lastKnownWriteTime" : 1545645911,
+    "last_content_update" : 1545645911729,
     "path" : "~/Downloads/R_projects/Expanet_web_portal/Expanet/global.R",
     "project_path" : "global.R",
     "properties" : {
-        "cursorPosition" : "6,14",
+        "cursorPosition" : "19,31",
         "scrollLine" : "0",
         "tempName" : "Untitled1"
     },

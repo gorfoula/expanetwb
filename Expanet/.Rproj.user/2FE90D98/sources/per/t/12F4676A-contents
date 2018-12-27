@@ -14,7 +14,7 @@ plan(multiprocess)
 kegg.folder<<-"orgs_gene_sets"
 res.folder<<-"data/output"
 temp.name<<-strsplit(tempfile("res", fileext = c("")),split = "/")[[1]][4]
-tf<<-paste("data/output/",temp.name,sep = "")
+tf<<-paste(res.folder,"/",temp.name,sep = "")
 d1<<-paste(tf,"/C",sep = "")
 d2<<-paste(tf,"/T",sep = "")
 d3<<-paste(tf,"/CVST",sep = "")
