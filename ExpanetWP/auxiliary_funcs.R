@@ -97,6 +97,26 @@ valid.tm.table <- function(df) {
   if(length(indx)>0){res=0}
   return(res)
 }
+valid.table.messages <- function(v1,steptxt,btn) {
+  c.msgs=c(paste("The table is not square. #Rows:",v1[3],
+                 " #Columns: ",v1[4],".",sep = ""),
+           paste("The table contains non numeric values at columns: ",
+                 v1[5],".",sep = "")
+  )
+  if(v1[1]=="TRUE" & v1[2]=="TRUE"){
+    showNotification(paste(Sys.time(),", ",steptxt," matrix looks ok!")
+                     , duration = 10
+                     ,type="message")
+    shinyjs::show(btn)
+  }else{
+    c.msgs.string=paste(c.msgs[v1[1:2]=="FALSE"],
+                        collapse=" ")
+    showNotification(paste(Sys.time(),", ",steptxt," ",c.msgs.string)
+                     , duration = 15
+                     ,type="error")
+    shinyjs::hide(btn)
+  }
+}
 
 exec1 <- function(tm,gse,lbl,out.dir) {
   runExpanet( treatment.label = lbl,

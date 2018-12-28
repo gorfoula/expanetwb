@@ -15,8 +15,8 @@ ui <- function(req) {
   dashboardPage(skin = "black",
                 dashboardHeader(title = title, titleWidth = 200),
                 dashboardSidebar(
-                  sidebarSearchForm(textId = "searchText", buttonId = "searchButton",
-                                    label = "Search..."),
+                  #sidebarSearchForm(textId = "searchText", buttonId = "searchButton",
+                  #                  label = "Search..."),
                   sidebarMenu(id = "sidebar",
                               ###### SIDE MENU ####
                               menuItem("Load your data", tabName = "dselection", icon = icon("database")),
@@ -173,7 +173,7 @@ ui <- function(req) {
                               )
                             )
                     ),
-                    #### MONITOR RESULTS TAB#####
+                    #### REFRESH STATUS #####
                     tabItem(tabName = "results",
                             fluidRow(
                               tabBox(
@@ -206,7 +206,7 @@ ui <- function(req) {
                                                   )
                                            )
                                          ),
-                                ##### SCORE MATRIX #######s
+                                ##### SCORE MATRIX ######
                                 tabPanel("Enriched Pathways",
                                          box(title = "Score Table",status = "info"
                                              ,width=NULL,solidHeader = TRUE,
@@ -224,33 +224,20 @@ ui <- function(req) {
                                 tabPanel("Networks",height = "100%",
                                          fluidRow(
                                            column(width = 12,
-                                                  div(style="display: inline-block;vertical-align:top; margin-top: 8px;width: 100%;"
+                                                  div(style="display: inline-block;vertical-align:top; margin-top: 8px;margin-bottom: 8px;width: 100%;"
                                                       ,actionButton(inputId = "gmlplot.button"
                                                                     , label = "Get the list of Pathways")
-                                                      ),
+                                                  ),
                                                   uiOutput("layout")
                                                   ),
                                            column(width = 6,
-                                                  box(title = "Control",
-                                                      status = "primary",
-                                                      width = NULL,
-                                                      solidHeader = TRUE,collapsible = TRUE,
-                                                      uiOutput("dropdown.gmlplot.C"),
-                                                      plotOutput("graph.C")
-                                                  )
+                                                  uiOutput("graph.box1")
                                            ),
                                            column(width = 6,
-                                                  box(title = "Treatment",
-                                                      status = "info",
-                                                      width = NULL,
-                                                      solidHeader = TRUE,collapsible = TRUE,
-                                                      #background = "olive",
-                                                      uiOutput("dropdown.gmlplot.T"),
-                                                      plotOutput("graph.T")
-                                                      )
+                                                  uiOutput("graph.box2")
                                                   )
-                                         )
-                                ),
+                                           )
+                                         ),
                                 ###### DOWNLOAD PANEL #####
                                 tabPanel("Download",
                                          useShinyjs(),
@@ -270,28 +257,44 @@ ui <- function(req) {
                               )
                             )
                     ),
-                    ### ABOUT PAGE ###
+                    ### ABOUT PAGE ####
                     tabItem(tabName = "help_page",
                             fluidRow(
                               box(width=12,
                                   tags$h3("Input Tables"),
-                                  tags$p("The user must provide two matrices for each experiment, the transition and the adjacency matrix.
-                                         Both the transition and the adacency matrix are square. Based on the Hidden MArkov Model theory.
-                                         Every row of the transition matrix must sum up to 1.
+                                  tags$p("The user must provide two matrices for each experiment, the transition and the adjacency 
+                                          matrices which must be square. Based on the Hidden Markov Model theory, every row of the 
+                                          transition matrix must sum up to 1.
                                         "),
                                   tags$h3("Table Format"),
-                                  tags$p("The user must provide tab delimited files (.txt or .tab) and the tables must be numeric
-                                          whereas the first row and column should contain the proteins names. The Expanet web portal
-                                          interfaces validate the input files and informs the user of potential mistakes.
+                                  tags$p("The user must provide tab delimited files (.txt or .tab). The tables must not contain 
+                                          any non-numeric values whereas the first row and column should contain the proteins names. 
+                                          The Expanet web portal interfaces validate the input files and informs the user of 
+                                          potential mistakes.
                                         "),
                                   tags$img(src='about_table_validate.png', align = "center",height="200px"),
-                                  
                                   tags$h3("Gene Names"),
-                                  tags$p("The suported gene names are the ones provided from 
+                                  tags$p("The suported gene names are the ones provided by KEGG. For example for the human proteome (hsa),
+                                          the genes/proteins must be repressented by their Entrez gene IDs (e.g. '5595' for MAPK3 protein).
+                                          Another example is the Plasmodium proteome (pbe) where the genes/proteins are repressented by 
+                                          their gene names (e.g. 'PBANKA_071490','PBANKA_082340'). Tip: use the KEGREST R package to retrieve
+                                          the list of proteins names for a selected organism.
                                         "),
-                                  tags$h3("Supported Organisms and Pathways"),
+                                  tags$h3("Supported organisms and pathways"),
                                   tags$p("Currently only KEGG pathways are supported and for the organisms below:"),
-                                  tableOutput("supported.organisms")
+                                  tableOutput("supported.organisms"),
+                                  tags$h3("Job Submission"),
+                                  tags$p("The user can submit jobs folowing the step-by-step guide that can be accessed via
+                                         the 'Load your data' menu item of the side menu. The steps for job submission are:"),
+                                  tags$ol(tags$li("STEP1: Submission of the adjacency and transition matrices of the Control Experiment "),
+                                          tags$li("STEP2: Submission of the adjacency and transition matrices of another condition/treatment"),
+                                          tags$li("STEP3: Selection of the organism."),
+                                          tags$li("STEP4: Bookmarking of the session. This step is required in long running job submissions."),
+                                          tags$li("STEP5: Job submission")
+                                          ),
+                                  tags$p("The user can keep track of the file submission progress the already submitted files frof the 
+                                          the progress bars and the summary table on the top"),
+                                  tags$img(src='about_progress.png', align = "center",height="150px")
                               )
                               
                             )
@@ -299,14 +302,37 @@ ui <- function(req) {
                     tabItem(tabName = "contact_page",
                             fluidRow(
                               box(width=12,
-                                  tags$h3("Input Tables"),
-                                  tags$p("")
+                                  tags$h4(style="font-weight:bold","Associate Prof. Michalis Aivaliotis"),
+                                  box(width=8,
+                                      tags$p("Laboratory of Biological Chemistry, Faculty of Health Sciences, 
+                                              School of Medicine, Aristotle University of Thessaloniki, Building 16a,
+                                              3rd Floor, GR-54124, Thessaloniki, Greece
+                                        "),
+                                      tags$p("Center for Interdisciplinary Research and Innovation (CIRI-AUTH), 
+                                              Balkan Center, Buildings A & B, Thessaloniki, 10th km Thessaloniki-Thermi
+                                              Rd, P.O. Box 8318, GR 57001
+                                        ")
+                                      
+                                      ),
+                                  box(width=8,
+                                      tags$p(style="font-weight:bold","Tel.: +30-2310-999170"),
+                                      tags$p(style="font-weight:bold","e-mail: aivaliotis@auth.gr")
+                                  ),
+                                  box(width=8,
+                                      tags$p("Institute of Molecular Biology and Biotechnology-Foundation for Research and 
+                                              Technology, Nikolaou Plastira 100, GR-70013, Heraklion Crete, Greece
+                                        ")
+                                  ),
+                                  box(width=8,
+                                      tags$p(style="font-weight:bold","Tel.:  +30-2810-391063"),
+                                      tags$p(style="font-weight:bold","e-mail: aivaliot@imbb.forth.gr")
+                                  )
+                                )
                               )
-                              
                             )
-                    )
                     
-                  ),tags$style("#controlProgress1 {width:310px;}")
+                  ),
+                  tags$style("#controlProgress1 {width:310px;}")
                   ,tags$style("#controlProgress2 {width:310px;}")
                 )
   )
@@ -322,7 +348,9 @@ server <- function(input, output, session) {
   shinyjs::hide("add.button2.tran")
   #kegg.files <- list.files(path = "orgs_gene_sets", pattern = ".[.]R$", full.names = TRUE)
   ######## Reactive Values
-  tables <- reactiveValues(C.adj = NULL,T.adj=NULL,C.tm = NULL,T.tm=NULL,paths=NULL,allpaths=NULL,pnames=NULL)
+  tables <- reactiveValues(C.adj = NULL,T.adj=NULL,C.tm = NULL,T.tm=NULL,
+                           paths=NULL,allpaths=NULL,pnames=NULL,
+                           C.adj.n = NULL,T.adj.n = NULL,C.tm.n = NULL,T.tm.n = NULL)
   progressValue <- reactiveValues(one=0,two=0,three=0)
   smt<-matrix(nrow = 2,ncol = 2,"")
   colnames(smt)=c("Transition","Adjacency")
@@ -413,95 +441,31 @@ server <- function(input, output, session) {
       print(tables$paths)
     }
   })
-  ###### VALIDATE INPUT AT STEP 1
-  observeEvent(data1.adj(),{
-    shinyjs::hide("add.button1.adj")
-    v1=valid.table(data1.adj())
-    c.msgs=c(paste("The table is not square. #Rows:",v1[3],
-                   " #Columns: ",v1[4],".",sep = ""),
-             paste("The table contains non numeric values at columns: ",
-                   v1[5],".",sep = "")
-    )
-    if(v1[1]=="TRUE" & v1[2]=="TRUE"){
-      showNotification(paste(Sys.time(),", [STEP1] Adjacency matrix looks ok!")
-                       , duration = 10
-                       ,type="message")
-      shinyjs::show("add.button1.adj")
-    }else{
-      c.msgs.string=paste(c.msgs[v1[1:2]=="FALSE"],
-                          collapse=" ")
-      showNotification(paste(Sys.time(),", [STEP1] ",c.msgs.string)
-                       , duration = 15
-                       ,type="error")
-      shinyjs::hide("add.button1.adj")
-    }
-  })
+  ###### VALIDATE INPUTS:STEP 1 ####
   observeEvent(data1.tran(),{
     shinyjs::hide("add.button1.tran")
     v1=valid.table(data1.tran())
-    c.msgs=c(paste("The table is not square. #Rows:",v1[3],
-                   " #Columns: ",v1[4],".",sep = ""),
-             paste("The table contains non numeric values at columns: ",
-                   v1[5],".",sep = "")
-    )
-    if(v1[1]=="TRUE" & v1[2]=="TRUE"){
-      showNotification(paste(Sys.time(),", [STEP1] Transition matrix looks ok!")
-                       , duration = 10
-                       ,type="message")
-      shinyjs::show("add.button1.tran")
-    }else{
-      c.msgs.string=paste(c.msgs[v1[1:2]=="FALSE"],
-                          collapse=" ")
-      showNotification(paste(Sys.time(),", [STEP1] ",c.msgs.string)
-                       , duration = 15
-                       ,type="error")
-      shinyjs::hide("add.button1.tran")
-    }
+    tables$C.tm.n=v1[3]
+    valid.table.messages(v1,"[STEP1] Transition","add.button1.tran")
   })
-  ###### VALIDATE INPUT AT STEP 2
-  observeEvent(data2.adj(),{
-    shinyjs::hide("add.button2.adj")
-    v1=valid.table(data2.adj())
-    c.msgs=c(paste("The table is not square. #Rows:",v1[3],
-                   " #Columns: ",v1[4],".",sep = ""),
-             paste("The table contains non numeric values at columns: ",
-                   v1[5],".",sep = "")
-    )
-    if(v1[1]=="TRUE" & v1[2]=="TRUE"){
-      showNotification(paste(Sys.time(),", [STEP2] Adjacency matrix looks ok!")
-                       , duration = 10
-                       ,type="message")
-      shinyjs::show("add.button2.adj")
-    }else{
-      c.msgs.string=paste(c.msgs[v1[1:2]=="FALSE"],
-                          collapse=" ")
-      showNotification(paste(Sys.time(),", [STEP2] ",c.msgs.string)
-                       , duration = 15
-                       ,type="error")
-      shinyjs::hide("add.button2.adj")
-    }
+  observeEvent(data1.adj(),{
+    shinyjs::hide("add.button1.adj")
+    v1=valid.table(data1.adj())
+    tables$C.adj.n=v1[3]
+    valid.table.messages(v1,"[STEP1] Adjacency","add.button1.adj")
   })
+  ###### VALIDATE INPUTS:STEP 2  ####
   observeEvent(data2.tran(),{
     shinyjs::hide("add.button2.tran")
     v1=valid.table(data2.tran())
-    c.msgs=c(paste("The table is not square. #Rows:",v1[3],
-                   " #Columns: ",v1[4],".",sep = ""),
-             paste("The table contains non numeric values at columns: ",
-                   v1[5],".",sep = "")
-    )
-    if(v1[1]=="TRUE" & v1[2]=="TRUE"){
-      showNotification(paste(Sys.time(),", [STEP2] Transition matrix looks ok!")
-                       , duration = 10
-                       ,type="message")
-      shinyjs::show("add.button2.tran")
-    }else{
-      c.msgs.string=paste(c.msgs[v1[1:2]=="FALSE"],
-                          collapse=" ")
-      showNotification(paste(Sys.time(),", [STEP2] ",c.msgs.string)
-                       , duration = 15
-                       ,type="error")
-      shinyjs::hide("add.button2.tran")
-    }
+    tables$T.tm.n=v1[3]
+    valid.table.messages(v1,"[STEP2] Transition","add.button2.tran")
+  })
+  observeEvent(data2.adj(),{
+    shinyjs::hide("add.button2.adj")
+    v1=valid.table(data2.adj())
+    tables$T.adj.n=v1[3]
+    valid.table.messages(v1,"[STEP2] Adjacency","add.button2.adj")
   })
   ##### PROGRESS BARS #####
   output$progressOne <- renderUI({
@@ -528,7 +492,7 @@ server <- function(input, output, session) {
   ####### STEP1:ADD INPUT FILES ####
   observeEvent(input$add.button1.tran,{
     tmpt=progressTable()
-    tmpt[1,1]=isolate(input$file1.tran)$name
+    tmpt[1,1]=paste(isolate(input$file1.tran)$name,"\n(size: ",tables$C.tm.n,")",sep = "")
     txt="Transition"
     tables$C.tm=data1.tran()
     progressTable(tmpt)
@@ -540,7 +504,7 @@ server <- function(input, output, session) {
   })
   observeEvent(input$add.button1.adj,{
     tmpt=progressTable()
-    tmpt[1,2]=isolate(input$file1.adj)$name
+    tmpt[1,2]=paste(isolate(input$file1.adj)$name,"\n(size: ",tables$C.adj.n,")",sep = "")
     txt="Adjacency"
     tables$C.adj=data1.adj()
     progressTable(tmpt)
@@ -553,7 +517,7 @@ server <- function(input, output, session) {
   ####### STEP2:ADD INPUT FILES ####
   observeEvent(input$add.button2.tran,{
     tmpt=progressTable()
-    tmpt[2,1]=isolate(input$file2.tran)$name
+    tmpt[2,1]=paste(isolate(input$file2.tran)$name,"\n(size: ",tables$T.tm.n,")",sep = "")
     txt="Transition"
     tables$T.tm=data2.tran()
     progressTable(tmpt)
@@ -565,7 +529,7 @@ server <- function(input, output, session) {
   })
   observeEvent(input$add.button2.adj,{
     tmpt=progressTable()
-    tmpt[2,2]=isolate(input$file2.adj)$name
+    tmpt[2,2]=paste(isolate(input$file2.adj)$name,"\n(size: ",tables$T.adj.n,")",sep = "")
     txt="Adjacency"
     tables$T.adj=data2.adj()
     progressTable(tmpt)
@@ -648,10 +612,10 @@ server <- function(input, output, session) {
   })
   ####### REFRESH STATUS  #######
   output$header1<-renderText({
-    paste("<h3>",isolate(input$label1),"</h3>")
+    paste("<h3>",input$label1,"</h3>")
   })
   output$header2<-renderText({
-    paste("<h3>",isolate(input$label2),"</h3>")
+    paste("<h3>",input$label2,"</h3>")
   })
   autoRefreshStatus <- reactiveTimer(10000)
   observe({
@@ -749,6 +713,26 @@ server <- function(input, output, session) {
   ###### DROP DOWN GML GRAPHS - PLOT TAB ########
   observeEvent(input$gmlplot.button,{
     if(file.exists(d3)){
+      # box container 1
+      output$graph.box1<-renderUI({
+        box(title = isolate(input$label1),
+            status = "primary",
+            width = NULL,
+            solidHeader = TRUE,collapsible = TRUE,
+            uiOutput("dropdown.gmlplot.C"),
+            plotOutput("graph.C")
+        )
+      })
+      output$graph.box2<-renderUI({
+        box(title = isolate(input$label2),
+            status = "info",
+            width = NULL,
+            solidHeader = TRUE,collapsible = TRUE,
+            #background = "olive",
+            uiOutput("dropdown.gmlplot.T"),
+            plotOutput("graph.T")
+        )
+      })
       ### dropdown layout
       output$layout<-renderUI({
         selectInput("layout", "Layout", 
