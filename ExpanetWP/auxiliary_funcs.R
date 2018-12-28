@@ -217,3 +217,23 @@ status.expansion <- function(d,lb) {
   }
   return(txt)
 }
+
+delete.prev.files <- function(variables) {
+  if( file.exists(paste(d1,"/started.txt",sep = "")) ){
+    system(paste("rm ",d1,"/*.*",sep=""))
+    if(file.exists(paste(d1,"/graphs",sep = ""))){
+      ### delete graphs
+      system(paste("rm ",d1,"/graphs/*.*",sep=""))
+    }
+  }
+  if( file.exists(paste(d2,"/started.txt",sep = "")) ){
+    system(paste("rm ",d2,"/*.*",sep=""))
+    if(file.exists(paste(d2,"/graphs",sep = ""))){
+      ### delete graphs
+      system(paste("rm ",d2,"/graphs/*.*",sep=""))
+    }
+  }
+  if( file.exists(d3) ){
+    system(paste("rm ",d3,"/*.*",sep=""))
+  }
+}

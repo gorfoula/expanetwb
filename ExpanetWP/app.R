@@ -45,11 +45,15 @@ ui <- function(req) {
                                      box(title = "Submitted Files",status = "success",
                                          width = NULL,
                                          tableOutput("progresstable"),
+                                         useShinyjs(),
                                          div(style="display: block;vertical-align:top;margin-top: 1px",
-                                             actionButton(inputId = "load.example", label = "Load Example")
+                                             actionButton(inputId = "submit.button"
+                                                          , label = "Submit"),
+                                             actionButton(inputId = "load.example",
+                                                          label = "Load Example")
+                                             )
                                          )
                                      )
-                              )
                             ),
                             ####### STEP 1 ######
                             fluidRow(
@@ -151,27 +155,15 @@ ui <- function(req) {
                                          width = NULL,
                                          solidHeader = TRUE,collapsible = TRUE,
                                          background = "teal",
-                                         helpText("Expanet analysis might take days to complete. Press the Bookmark button and save the displayed url. Use this url to monitor the progress of the analysis."),
+                                         helpText("Expanet analysis may take days to complete. 
+                                                  Press the Bookmark button and save the displayed URL. 
+                                                  Access the results of your analysis through this URL."),
                                          div(style="display: inline-block;vertical-align:top; margin-top: 8px;width: 100%;"
                                              ,bookmarkButton()
                                              )
                                          )
                                      )
-                              ),
-                            fluidRow(
-                              column(width = 12,
-                                     box(title = "STEP5: Submit your Job",
-                                         width = 4,
-                                         solidHeader = TRUE,collapsible = TRUE,
-                                         background = "olive",
-                                         useShinyjs(),
-                                         div(style="display: inline-block;vertical-align:top; margin-top: 8px;width: 100%;"
-                                             ,actionButton(inputId = "submit.button"
-                                                           , label = "Submit")
-                                         )
-                                     )
                               )
-                            )
                     ),
                     #### REFRESH STATUS #####
                     tabItem(tabName = "results",
@@ -262,38 +254,41 @@ ui <- function(req) {
                             fluidRow(
                               box(width=12,
                                   tags$h3("Input Tables"),
-                                  tags$p("The user must provide two matrices for each experiment, the transition and the adjacency 
+                                  tags$p("Four matrices must be provided two for each experiment: the transition and the adjacency 
                                           matrices which must be square. Based on the Hidden Markov Model theory, every row of the 
                                           transition matrix must sum up to 1.
                                         "),
                                   tags$h3("Table Format"),
-                                  tags$p("The user must provide tab delimited files (.txt or .tab). The tables must not contain 
-                                          any non-numeric values whereas the first row and column should contain the proteins names. 
-                                          The Expanet web portal interfaces validate the input files and informs the user of 
+                                  tags$p("Tab delimited files must be provided (.txt or .tab). The tables must not contain 
+                                          any non-numeric values whereas the first row and column should contain the proteins/gene names.
+                                          For the format of the gene names refer to 'Gene Names' section.
+                                          The Expanet web portal interface validates the input files and informs the user of 
                                           potential mistakes.
                                         "),
                                   tags$img(src='about_table_validate.png', align = "center",height="200px"),
                                   tags$h3("Gene Names"),
-                                  tags$p("The suported gene names are the ones provided by KEGG. For example for the human proteome (hsa),
+                                  tags$p("The suported gene names are the ones provided by KEGG. For example in the case of the human proteome (hsa),
                                           the genes/proteins must be repressented by their Entrez gene IDs (e.g. '5595' for MAPK3 protein).
                                           Another example is the Plasmodium proteome (pbe) where the genes/proteins are repressented by 
                                           their gene names (e.g. 'PBANKA_071490','PBANKA_082340'). Tip: use the KEGREST R package to retrieve
                                           the list of proteins names for a selected organism.
                                         "),
                                   tags$h3("Supported organisms and pathways"),
-                                  tags$p("Currently only KEGG pathways are supported and for the organisms below:"),
+                                  tags$p("Currently only KEGG pathways are supported. The availiable organisms are listed in the table below:"),
                                   tableOutput("supported.organisms"),
                                   tags$h3("Job Submission"),
-                                  tags$p("The user can submit jobs folowing the step-by-step guide that can be accessed via
+                                  tags$p("Submit jobs by folowing the step-by-step guide that can be accessed via
                                          the 'Load your data' menu item of the side menu. The steps for job submission are:"),
                                   tags$ol(tags$li("STEP1: Submission of the adjacency and transition matrices of the Control Experiment "),
                                           tags$li("STEP2: Submission of the adjacency and transition matrices of another condition/treatment"),
                                           tags$li("STEP3: Selection of the organism."),
-                                          tags$li("STEP4: Bookmarking of the session. This step is required in long running job submissions."),
-                                          tags$li("STEP5: Job submission")
+                                          tags$li("STEP4: Bookmarking of the session. This step is required in long running job submissions.")
                                           ),
-                                  tags$p("The user can keep track of the file submission progress the already submitted files frof the 
-                                          the progress bars and the summary table on the top"),
+                                  tags$p("Submit this job by pressing the 'Submit' button on the top. Load an example dataset by pressing
+                                         the 'Load Example' button."),
+                                  tags$img(src='about_submit.png', align = "center",height="180px"),
+                                  tags$p("Keep track of the file submission progress and the already submitted files names by
+                                          the progress bars and the summary table on the top."),
                                   tags$img(src='about_progress.png', align = "center",height="150px")
                               )
                               
@@ -373,7 +368,8 @@ server <- function(input, output, session) {
     )
     progressValue$one=100
     progressValue$two=100
-    shinyjs::hide("paths.radio")
+    shinyjs::disable("paths.radio")
+    shinyjs::disable("organism")
     shinyjs::show("submit.button")
   })
   ######### TABLE LOADING ##########
@@ -438,7 +434,7 @@ server <- function(input, output, session) {
     }else{
       sel.pth=which(   (names(tables$allpaths)== sub("path:","",input$dropdown.path.radio))  ==TRUE)
       tables$paths=tables$allpaths[sel.pth]
-      print(tables$paths)
+      #print(tables$paths)
     }
   })
   ###### VALIDATE INPUTS:STEP 1 ####
@@ -499,6 +495,9 @@ server <- function(input, output, session) {
     ####### Notify User
     showNotification(paste(Sys.time(),", [STEP1] ",txt," matrix successfully submitted")
                      , duration = 10,type="message")
+    #### show organism selections
+    shinyjs::enable("paths.radio")
+    shinyjs::enable("organism")
     ###### Monitor submission level
     progressValue$one <- (1- ((is.null(tables$C.tm)+is.null(tables$C.adj))/2) )*100
   })
@@ -511,6 +510,9 @@ server <- function(input, output, session) {
     ####### Notify User
     showNotification(paste(Sys.time(),", [STEP1] ",txt," matrix successfully submitted")
                      , duration = 10,type="message")
+    #### show organism selections
+    shinyjs::enable("paths.radio")
+    shinyjs::enable("organism")
     ###### Monitor submission level
     progressValue$one <- (1- ((is.null(tables$C.tm)+is.null(tables$C.adj))/2) )*100
   })
@@ -524,6 +526,9 @@ server <- function(input, output, session) {
     ####### Notify User
     showNotification(paste(Sys.time(),", [STEP2] ",txt," matrix successfully submitted")
                      , duration = 10,type="message")
+    #### show organism selections
+    shinyjs::enable("paths.radio")
+    shinyjs::enable("organism")
     ###### Monitor submission level
     progressValue$two <- (1- ((is.null(tables$T.tm)+is.null(tables$T.adj))/2) )*100
   })
@@ -536,6 +541,9 @@ server <- function(input, output, session) {
     ####### Notify User
     showNotification(paste(Sys.time(),", [STEP2] ",txt," matrix successfully submitted")
                      , duration = 10,type="message")
+    #### show organism selections
+    shinyjs::enable("paths.radio")
+    shinyjs::enable("organism")
     ###### Monitor submission level
     progressValue$two <- (1- ((is.null(tables$T.tm)+is.null(tables$T.adj))/2) )*100
   })
@@ -546,23 +554,24 @@ server <- function(input, output, session) {
         shinyjs::show("submit.button")
       }
     })
-  ######### EXPANET STEP1 - SUBMISION ######
+  ######### EXPANET EXPANSION ######
   expanet.st <- reactiveVal(0)
   expanet.st2 <- reactiveVal(0)
   expanet.fin <- reactiveVal(0)
   observeEvent(input$submit.button,{
-    print(isolate(tables$paths))
-    system(paste("rm ",d1,"/*.*",sep=""))
-    system(paste("rm ",d2,"/*.*",sep=""))
-    system(paste("rm ",d3,"/*.*",sep=""))
+    ##### empty results folder
+    delete.prev.files()
     write.table("final step started",paste(d1,"/started.txt",sep = ""),sep = "\t")
+    showNotification(paste(Sys.time(),"Job successfully submitted!")
+                   , duration = 10
+                   ,type="message")
     future(exec1(isolate(tables$C.tm),isolate(tables$paths),"C",d1)
     )%...>%   #this part is not actually working
       expanet.st() %...!%  # Assign to data 
       (function(e) {
         expanet.st(0)
-        print(e)
-        write.table("error",file=paste(d1,"/errors.txt",sep = ""),sep = "\t")
+        print(e$message)
+        write.table(as.character(e$message),file=paste(d1,"/errors.txt",sep = ""),sep = "\t")
         warning(e)
         session$close()
       })
@@ -572,8 +581,8 @@ server <- function(input, output, session) {
       expanet.st2() %...!%  # Assign to data 
       (function(e) {
         expanet.st2(0)
-        print(e)
-        write.table("error",file=paste(d2,"/errors.txt",sep = ""),sep = "\t")
+        print(e$message)
+        write.table(as.character(e$message),file=paste(d2,"/errors.txt",sep = ""),sep = "\t")
         warning(e)
         session$close()
       })
@@ -581,7 +590,7 @@ server <- function(input, output, session) {
     # the last expression.
     NULL
   })
-  ###### EXPANET STEP2 #######
+  ###### EXPANET ENRICHMENT #######
   autoInvalidate <- reactiveTimer(10000)
   observe({
     # Invalidate and re-execute this reactive expression every time the
@@ -602,8 +611,8 @@ server <- function(input, output, session) {
         expanet.fin() %...!%  # Assign to data 
         (function(e) {
           expanet.fin(0)
-          print(e)
-          #write.table("error",file=paste(d3,"/errors.txt",sep = ""),sep = "\t")
+          print(e$message)
+          write.table(as.character(e$message),file=paste(d3,"/errors.txt",sep = ""),sep = "\t")
           warning(e)
           session$close()
         })
