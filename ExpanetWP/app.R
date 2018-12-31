@@ -255,15 +255,16 @@ ui <- function(req) {
                               box(width=12,
                                   tags$h3("Input Tables"),
                                   tags$p("Four matrices must be provided two for each experiment: the transition and the adjacency 
-                                          matrices which must be square. Based on the Hidden Markov Model theory, every row of the 
+                                          matrices which must be square. Based on the Hidden Markov Model theory every row of the 
                                           transition matrix must sum up to 1.
                                         "),
+                                  div(tableOutput("supported.file.format"), style = "font-size:8pt"),
                                   tags$h3("Table Format"),
                                   tags$p("Tab delimited files must be provided (.txt or .tab). The tables must not contain 
                                           any non-numeric values whereas the first row and column should contain the proteins/gene names.
                                           For the format of the gene names refer to 'Gene Names' section.
-                                          The Expanet web portal interface validates the input files and informs the user of 
-                                          potential mistakes.
+                                          The Expanet web portal interface validates the input files and informs the user about the 
+                                          table format problems.
                                         "),
                                   tags$img(src='about_table_validate.png', align = "center",height="200px"),
                                   tags$h3("Gene Names"),
@@ -286,7 +287,7 @@ ui <- function(req) {
                                           ),
                                   tags$p("Submit this job by pressing the 'Submit' button on the top. Load an example dataset by pressing
                                          the 'Load Example' button."),
-                                  tags$img(src='about_submit.png', align = "center",height="180px"),
+                                  tags$img(src='about_submit.png', align = "center",height="180px",style="margin-bottom: 8px"),
                                   tags$p("Keep track of the file submission progress and the already submitted files names by
                                           the progress bars and the summary table on the top."),
                                   tags$img(src='about_progress.png', align = "center",height="150px")
@@ -327,8 +328,8 @@ ui <- function(req) {
                             )
                     
                   ),
-                  tags$style("#controlProgress1 {width:310px;}")
-                  ,tags$style("#controlProgress2 {width:310px;}")
+                  tags$style("#controlProgress1 {width:310px;}"),
+                  tags$style("#controlProgress2 {width:310px;}")
                 )
   )
   
@@ -368,7 +369,7 @@ server <- function(input, output, session) {
     )
     progressValue$one=100
     progressValue$two=100
-    shinyjs::disable("paths.radio")
+    #shinyjs::disable("paths.radio")
     shinyjs::disable("organism")
     shinyjs::show("submit.button")
   })
@@ -405,6 +406,9 @@ server <- function(input, output, session) {
   output$supported.organisms <- renderTable({
     orgs.sel
   })
+  output$supported.file.format <- renderTable({
+    load.file("data/control_adj.txt")[1:5,1:5]
+  },rownames = TRUE,bordered = TRUE,spacing = "xs")
   output$choose.organism <- renderUI({
     selectInput("organism", "Organism", as.list(orgs.sel[,2]))
     
@@ -570,7 +574,7 @@ server <- function(input, output, session) {
       expanet.st() %...!%  # Assign to data 
       (function(e) {
         expanet.st(0)
-        print(e$message)
+        print(e)
         write.table(as.character(e$message),file=paste(d1,"/errors.txt",sep = ""),sep = "\t")
         warning(e)
         session$close()
